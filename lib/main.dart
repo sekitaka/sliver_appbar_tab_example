@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'dart:math';
 
@@ -26,84 +28,41 @@ class MyHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: DefaultTabController(
-          length: 2,
-          child: NestedScrollView(
-            headerSliverBuilder: (context, hoge) {
-              return [
-                SliverPersistentHeader(
-                    pinned: true,
-                    // floating: true,
-                    delegate: MySliverPersistentHeaderDelegate())
-              ];
-            },
-            body: TabBarView(
+    double screenWidth = MediaQuery.of(context).size.width;
+    // TabBarで設定されるTabの左右の余白(tabs.dartのadjustedPaddingより推測)
+    final double tabContentPadding = 16;
+    final tabCount = 3;
+    final tabWidth =
+        (screenWidth - tabCount * 2 * tabContentPadding) / tabCount;
+    return DefaultTabController(
+        length: tabCount,
+        child: Scaffold(
+          body: SafeArea(
+            child: Column(
               children: [
-                ListView.builder(
-                  key: PageStorageKey(0), // keep scroll position
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text("page one:$index"),
-                    );
-                  },
-                  itemCount: 50,
-                ),
-                ListView.builder(
-                  key: PageStorageKey(1),
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text("page two:$index"),
-                    );
-                  },
-                  itemCount: 80,
-                ),
+                TabBar(tabs: [
+                  Tab(
+                    child: Container(
+                      width: tabWidth,
+                      color: Colors.pink,
+                    ),
+                  ),
+                  Tab(
+                    child: Container(
+                      width: tabWidth,
+                      color: Colors.amber,
+                    ),
+                  ),
+                  Tab(
+                    child: Container(
+                      width: tabWidth,
+                      color: Colors.cyan,
+                    ),
+                  ),
+                ]),
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class MySliverPersistentHeaderDelegate extends SliverPersistentHeaderDelegate {
-  @override
-  double get maxExtent => 200;
-
-  @override
-  double get minExtent => 48; // from tab height
-
-  @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
-    print("so:$shrinkOffset, oc:$overlapsContent");
-    return Container(
-      color: Colors.pinkAccent,
-      height: max(maxExtent - shrinkOffset, minExtent),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            color: Colors.green,
-            height: max(maxExtent - shrinkOffset - minExtent, 0),
-          ),
-          TabBar(tabs: [
-            Tab(
-              text: "page1",
-            ),
-            Tab(
-              text: "page2",
-            ),
-          ]),
-        ],
-      ),
-    );
-  }
-
-  @override
-  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) {
-    return true;
+        ));
   }
 }
